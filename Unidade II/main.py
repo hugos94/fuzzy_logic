@@ -19,7 +19,6 @@ def main():
 
 	discourse_universe = np.arange(min_u, max_u + discretization, discretization)
 
-	# Cria lista com o menor e maior valor de cada conjunto
 	set_a = [min_a, max_a]
 	set_b = [min_b, max_b]
 
