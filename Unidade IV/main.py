@@ -134,11 +134,10 @@ def fill_set(fuzzy_set): # Retorna um conjunto fuzzy com todos os elementos pres
     global min_u, max_u
     for key in range(min_u, max_u+1):
         if not str(key) in fuzzy_set.keys():
-            fuzzy_set[key] = 0.0
+            fuzzy_set[str(key)] = 0.0
     return fuzzy_set
 
 def equality(fuzzy_set_1, fuzzy_set_2): # Retorna o grau de igualdade entre dois conjuntos fuzzy
-
     msg = ''
     equality_degree = 0.0
     fuzzy_set_1 = fill_set(fuzzy_set_1)
