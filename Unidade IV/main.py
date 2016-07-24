@@ -226,3 +226,39 @@ def operations(fuzzy_set):
 
 if __name__ == '__main__':
     main()
+
+# create_discourse_universe()
+#
+# F1 = '0.0/1 + 0.0/2 + 0.0/3 + 0.0/4 + 0.4/5 + 0.6/6 + 0.8/7 + 1.0/8 + 0.8/9 + 0.6/10'
+# F2 = '0.0/1 + 0.0/2 + 0.0/3 + 0.0/4 + 0.4/5 + 0.5/6 + 0.6/7 + 1.0/8 + 0.6/9 + 0.4/10'
+# F3 = '0.0/1 + 1.0/2 + 0.2/3 + 0.3/4 + 0.4/5 + 0.5/6 + 0.6/7 + 1.0/8 + 0.5/9 + 0.0/10'
+#
+# F1 = F1.replace(" + ", "|")
+# F1 = F1.split("|")
+# fuzzy_set1 = {}
+# for element in F1:
+#     el = element.split('/')
+#     fuzzy_set1[el[1]] = float(el[0])
+#
+# F2 = F2.replace(" + ", "|")
+# F2 = F2.split("|")
+# fuzzy_set2 = {}
+# for element in F2:
+#     el = element.split('/')
+#     fuzzy_set2[el[1]] = float(el[0])
+#
+# F3 = F3.replace(" + ", "|")
+# F3 = F3.split("|")
+# fuzzy_set3 = {}
+# for element in F3:
+#     el = element.split('/')
+#     fuzzy_set3[el[1]] = float(el[0])
+#
+# print 'Igualdade: ' + str(equality(fuzzy_set1, fuzzy_set2))
+# print 'Inclusao: ' + str(inclusion(fuzzy_set1, fuzzy_set2))
+#
+# print 'Igualdade: ' + str(equality(fuzzy_set1, fuzzy_set3))
+# print 'Inclusao: ' + str(inclusion(fuzzy_set1, fuzzy_set3))
+#
+# print 'Igualdade: ' + str(equality(fuzzy_set2, fuzzy_set3))
+# print 'Inclusao: ' + str(inclusion(fuzzy_set2, fuzzy_set3))
