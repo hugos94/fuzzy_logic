@@ -4,47 +4,182 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 def main():
-    pass
+    global min_u, max_u, discourse_universe, label
 
-# def main():
-#     global min_U, max_U, universo_discurso, titulo
-#
-#     while (True):
-#
-#         opcao = raw_input('Digite a questao do exercicio a ser executada (6, 7 ou 8): ')
-#         opcao = opcao.upper()
-#
+    while (True):
+        option = raw_input('Informe a questao a ser executada (6, 7, 8 ou sair): ')
+        option = option.upper()
+
+        if option == '6':
+            print '\nQuestao 6: '
+            create_discourse_universe()
+            fuzzy_set_1 = read_fuzzy_set()
+            fuzzy_set_2 = read_fuzzy_set()
+
+            print 'Intersecao: '
+            fuzzy_intersection(fuzzy_set_1, fuzzy_set_2)
+            print 'Intersecao.\n'
+
+            print 'Uniao: '
+            fuzzy_union(fuzzy_set_1, fuzzy_set_2)
+            print 'Uniao.\n'
+
+            print 'Complemento: '
+            op = raw_input('Escolha um entre os conjuntos fuzzy inseridos anteriormente (1 ou 2): ')
+            if op == '1':
+                fuzzy_set = set_fuzzy_1
+            elif op == '2':
+                fuzzy_set = set_fuzzy_2
+            print '\nInforme os valores para o complemento: '
+            a = raw_input('Digite um valor para treshold, entre 0 e 1: ')
+            l = raw_input('Digite um valor para lambda, maior que -1: ')
+            w = raw_input('Digite um valor para W, maior que 0: ')
+            fuzzy_complement(fuzzy_set, a, l, w)
+            print 'Complemento.\n'
+
+        elif option == '7':
+            break
+
+        elif option == '8':
+            break
+
+        else:
+            print 'Finalizando o programa...'
+            break
+
+def fuzzy_intersection(fuzzy_set_1, fuzzy_set_2, msg=True):
+    fuzzy_set_1 = fill_set(fuzzy_set_1)
+    fuzzy_set_2 = fill_set(fuzzy_set_2)
+
+    fuzzy_set_minimum = {}
+    fuzzy_set_product = {}
+    fuzzy_set_lukasiewicz = {}
+    fuzzy_set_drastic_product = {}
+
+    for key in fuzzy_set_1:
+        fuzzy_set_minimum[key] = min(fuzzy_set_1[key], fuzzy_set_2[key])
+        fuzzy_set_product[key] = fuzzy_set_1[key] * fuzzy_set_2[key]
+        fuzzy_set_lukasiewicz[key] = max(fuzzy_set_1[key] + fuzzy_set_2[key] - 1.0, 0.0)
+
+        if fuzzy_set_1[key] == 1.0:
+            fuzzy_set_drastic_product[key] = fuzzy_set_2[key]
+        elif fuzzy_set_2[key] == 1.0:
+            fuzzy_set_drastic_product[key] = fuzzy_set_1[key]
+        else:
+            fuzzy_set_drastic_product[key] = 0.0
+
+    if msg:
+        print 'Minimo: ' + fuzzy_set_sort(fuzzy_set_minimum)
+        print 'Produto: ' + fuzzy_set_sort(fuzzy_set_product)
+        print 'Lukasiewicz: ' + fuzzy_set_sort(fuzzy_set_lukasiewicz)
+        print 'Produto Drastico: ' + fuzzy_set_sort(fuzzy_set_drastic_product)
+    else:
+        results = {}
+        results['minimo'] = fuzzy_set_minimum
+        results['produto'] = fuzzy_set_product
+        results['lukasiewicz'] = fuzzy_set_lukasiewicz
+        results['produto_drastico'] = fuzzy_set_drastic_product
+        return results
+
+def fuzzy_union(fuzzy_set_1, fuzzy_set_2, msg=True): # Retorna a uniao entre dois conjuntos fuzzy
+    fuzzy_set_1 = fill_set(fuzzy_set_1)
+    fuzzy_set_2 = fill_set(fuzzy_set_2)
+
+    fuzzy_set_maximum = {}
+    fuzzy_set_probabilistic_sum = {}
+    fuzzy_set_lukasiewicz = {}
+    fuzzy_set_drastic_sum = {}
+
+    for key in fuzzy_set_1:
+        fuzzy_set_maximum[key] = max(fuzzy_set_1[key], fuzzy_set_2[key])
+        fuzzy_set_probabilistic_sum[key] = (fuzzy_set_1[key] + fuzzy_set_2[key]) - (fuzzy_set_1[key] * fuzzy_set_2[key])
+        fuzzy_set_lukasiewicz[key] = min(fuzzy_set_1[key] + fuzzy_set_2[key], 1.0)
+
+        if fuzzy_set_1[key] = 0.0:
+            fuzzy_set_drastic_sum[key] = fuzzy_set_2[key]
+        elif fuzzy_set_2[key] = 0.0:
+            fuzzy_set_drastic_sum[key] = fuzzy_set_1[key]
+        else:
+            fuzzy_set_drastic_sum[key] = 1.0
+
+    if msg:
+        print 'Maximo: ' + fuzzy_set_sort(fuzzy_set_maximum)
+        print 'Soma Probabilistica: ' + fuzzy_set_sort(fuzzy_set_probabilistic_sum)
+        print 'Lukasiewicz: ' + fuzzy_set_sort(fuzzy_set_lukasiewicz)
+        print 'Soma Drastica: ' + fuzzy_set_sort(fuzzy_set_drastic_sum)
+    else:
+        results = {}
+        results['maximo'] = fuzzy_set_maximum
+        results['soma_probabilistica'] = fuzzy_set_probabilistic_sum
+        results['lukasiewicz'] = fuzzy_set_lukasiewicz
+        results['soma_drastica'] = fuzzy_set_drastic_sum
+        return results
+
+def fuzzy_complement(fuzzy_set, a, l, w, msg=True):
+    fuzzy_set = fill_set(fuzzy_set)
+
+    fuzzy_set_standard = {}
+    fuzzy_set_threshold = {}
+    fuzzy_set_sugeno = {}
+    fuzzy_set_yager = {}
+
+    for key in fuzzy_set:
+        fuzzy_set_standard[key] = 1.0 - fuzzy_set[key]
+        fuzzy_set_sugeno[key] = (1.0 - fuzzy_set[key]) / (1.0 + (float(l) * fuzzy_set[key]))
+        fuzzy_set_yager[key] = math.pow(1.0 - math.pow(fuzzy_set[key], float(w)), 1.0 / float(w))
+
+        if fuzzy_set[key] < float(a):
+            fuzzy_set_threshold[key] = 1.0
+        else:
+            fuzzy_set_threshold[key] = 0.0
+
+    if msg:
+        print 'Complemento de 1: ' + fuzzy_set_sort(fuzzy_set_standard)
+        print 'Treshold: ' + fuzzy_set_sort(fuzzy_set_threshold)
+        print 'Sugeno: ' + fuzzy_set_sort(fuzzy_set_sugeno)
+        print 'Yager: ' + fuzzy_set_sort(fuzzy_set_yager)
+    else:
+        results = {}
+        results['padrao'] = fuzzy_set_standard
+        results['threshold'] = fuzzy_set_threshold
+        results['sugeno'] = fuzzy_set_sugeno
+        results['yager'] = fuzzy_set_yager
+        return results
+
+def create_discourse_universe(): # Cria o universo de discurso
+    global min_u, max_u
+    fuzzy_set = raw_input('Informe o primeiro e o ultimo valor do Universo de Discurso (Ex.: 0-4): ')
+    fuzzy_set = fuzzy_set.split('-')
+    min_u = int(fuzzy_set[0])
+    max_u = int(fuzzy_set[1])
+
+def read_fuzzy_set(): # Le os valores do conjunto fuzzy
+    input_set = raw_input('Informe o conjunto fuzzy (Ex.: 0.2/2 + 0.5/5 + 1.0/6 + 0.1/7): ')
+    input_set = input_set.split(' + ')
+    fuzzy_set = {}
+    for element in input_set:
+        el = element.split('/')
+        fuzzy_set[el[1]] = float(el[0])
+    return fuzzy_set
+
+def fill_set(fuzzy_set): # Retorna um conjunto fuzzy com todos os elementos presentes no universo de discurso
+    global min_u, max_u
+    for key in range(min_u, max_u+1):
+        if not str(key) in fuzzy_set.keys():
+            fuzzy_set[str(key)] = 0.0
+    return fuzzy_set
+
+def fuzzy_set_sort(set_fuzzy): # Retorna o conjunto fuzzy ordenado
+    keys = set_fuzzy.keys()
+    keys.sort()
+    msg = ''
+    for key in keys:
+        msg += str(set_fuzzy[key]) + '/' + key
+        if key != key[-1]:
+            msg += ' + '
+    return msg
+
 #         if opcao == '6':
-#             # Questao 6 ------------------ #
-#             print '\n----: QUESTAO 6 :----'
-#
-#             cria_universo_discurso()
-#
-#             print '\nINSIRA 2 CONJUNTOS FUZZY:'
-#             conjunto_fuzzy_1 = le_conjunto()
-#             conjunto_fuzzy_2 = le_conjunto()
-#
-#             print '-- INTERSECAO --'
-#             intersecao(conjunto_fuzzy_1, conjunto_fuzzy_2)
-#             print '-- INTERSECAO --\n'
-#
-#             print '-- UNIAO --'
-#             uniao(conjunto_fuzzy_1, conjunto_fuzzy_2)
-#             print '-- UNIAO --\n'
-#
-#             print '-- COMPLEMENTO --'
-#             print 'INSIRA CONJUNTO FUZZY PARA GERAR COMPLEMENTO:'
-#             op = raw_input('Escolha um entre os conjuntos inseridos anteriormente (1 ou 2): ')
-#             if op == '1':
-#                 conjunto_fuzzy = conjunto_fuzzy_1
-#             elif op == '2':
-#                 conjunto_fuzzy = conjunto_fuzzy_2
-#             print '\nINSIRA OS VALORES PARA COMPLEMENTO:'
-#             a = raw_input('Digite um valor para treshold, entre 0 e 1: ')
-#             l = raw_input('Digite um valor para lambda, maior que -1: ')
-#             w = raw_input('Digite um valor para W, maior que 0: ')
-#             complemento(conjunto_fuzzy, a, l, w)
-#             print '-- COMPLEMENTO --\n'
 #
 #             print '-- AGREGACAO --'
 #             agregacao(conjunto_fuzzy_1, conjunto_fuzzy_2)
@@ -377,106 +512,6 @@ def main():
 #         	break
 #
 #
-# def intersecao(conjunto_fuzzy_1, conjunto_fuzzy_2, return_msg=True):
-#     conjunto_fuzzy_1 = preenche_conjunto(conjunto_fuzzy_1)
-#     conjunto_fuzzy_2 = preenche_conjunto(conjunto_fuzzy_2)
-#
-#     conjunto_fuzzy_minimo = {}
-#     conjunto_fuzzy_produto = {}
-#     conjunto_fuzzy_lukasiewicz = {}
-#     conjunto_fuzzy_produto_drastico = {}
-#
-#     for chave in conjunto_fuzzy_1:
-#         conjunto_fuzzy_minimo[chave] = min(conjunto_fuzzy_1[chave], conjunto_fuzzy_2[chave])
-#         conjunto_fuzzy_produto[chave] = conjunto_fuzzy_1[chave] * conjunto_fuzzy_2[chave]
-#         conjunto_fuzzy_lukasiewicz[chave] = max(conjunto_fuzzy_1[chave] + conjunto_fuzzy_2[chave] - 1.0, 0.0)
-#
-#         if conjunto_fuzzy_1[chave] == 1.0:
-#             conjunto_fuzzy_produto_drastico[chave] = conjunto_fuzzy_2[chave]
-#         elif conjunto_fuzzy_2[chave] == 1.0:
-#             conjunto_fuzzy_produto_drastico[chave] = conjunto_fuzzy_1[chave]
-#         else:
-#             conjunto_fuzzy_produto_drastico[chave] = 0.0
-#
-#     if return_msg:
-#         print 'Minimo: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_minimo )
-#         print 'Produto: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_produto )
-#         print 'Lukasiewicz: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_lukasiewicz )
-#         print 'Produto Drastico: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_produto_drastico )
-#     else:
-#         resultado = {}
-#         resultado['minimo'] = conjunto_fuzzy_minimo
-#         resultado['produto'] = conjunto_fuzzy_produto
-#         resultado['lukasiewicz'] = conjunto_fuzzy_lukasiewicz
-#         resultado['produto_drastico'] = conjunto_fuzzy_produto_drastico
-#         return resultado
-#
-#
-# def uniao(conjunto_fuzzy_1, conjunto_fuzzy_2, return_msg=True):
-#     conjunto_fuzzy_1 = preenche_conjunto(conjunto_fuzzy_1)
-#     conjunto_fuzzy_2 = preenche_conjunto(conjunto_fuzzy_2)
-#
-#     conjunto_fuzzy_maximo = {}
-#     conjunto_fuzzy_soma_probabilistica = {}
-#     conjunto_fuzzy_lukasiewicz = {}
-#     conjunto_fuzzy_soma_drastica = {}
-#
-#     for chave in conjunto_fuzzy_1:
-#         conjunto_fuzzy_maximo[chave] = max(conjunto_fuzzy_1[chave], conjunto_fuzzy_2[chave])
-#         conjunto_fuzzy_soma_probabilistica[chave] = (conjunto_fuzzy_1[chave] + conjunto_fuzzy_2[chave]) - (conjunto_fuzzy_1[chave] * conjunto_fuzzy_2[chave])
-#         conjunto_fuzzy_lukasiewicz[chave] = min(conjunto_fuzzy_1[chave] + conjunto_fuzzy_2[chave], 1.0)
-#
-#         if conjunto_fuzzy_1[chave] == 0.0:
-#             conjunto_fuzzy_soma_drastica[chave] = conjunto_fuzzy_2[chave]
-#         elif conjunto_fuzzy_2[chave] == 0.0:
-#             conjunto_fuzzy_soma_drastica[chave] = conjunto_fuzzy_1[chave]
-#         else:
-#             conjunto_fuzzy_soma_drastica[chave] = 1.0
-#
-#     if return_msg:
-#         print 'Maximo: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_maximo )
-#         print 'Soma Probabilistica: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_soma_probabilistica )
-#         print 'Lukasiewicz: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_lukasiewicz )
-#         print 'Soma Drastica: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_soma_drastica )
-#     else:
-#         resultado = {}
-#         resultado['maximo'] = conjunto_fuzzy_maximo
-#         resultado['soma_probabilistica'] = conjunto_fuzzy_soma_probabilistica
-#         resultado['lukasiewicz'] = conjunto_fuzzy_lukasiewicz
-#         resultado['soma_drastica'] = conjunto_fuzzy_soma_drastica
-#         return resultado
-#
-#
-# def complemento(conjunto_fuzzy, a, l, w, return_msg=True):
-#     conjunto_fuzzy = preenche_conjunto(conjunto_fuzzy)
-#
-#     conjunto_fuzzy_padrao = {}
-#     conjunto_fuzzy_threshold = {}
-#     conjunto_fuzzy_sugeno = {}
-#     conjunto_fuzzy_yager = {}
-#
-#     for chave in conjunto_fuzzy:
-#         conjunto_fuzzy_padrao[chave] = 1.0 - conjunto_fuzzy[chave]
-#         conjunto_fuzzy_sugeno[chave] = (1.0-conjunto_fuzzy[chave]) / ( 1.0 + (float(l) * conjunto_fuzzy[chave]) )
-#         conjunto_fuzzy_yager[chave] = math.pow( 1.0 - math.pow(conjunto_fuzzy[chave], float(w)) , 1.0/float(w) )
-#
-#         if conjunto_fuzzy[chave] < float(a):
-#             conjunto_fuzzy_threshold[chave] = 1.0
-#         else:
-#             conjunto_fuzzy_threshold[chave] = 0.0
-#
-#     if return_msg:
-#         print 'Complemento de 1: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_padrao )
-#         print 'Treshold: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_threshold )
-#         print 'Sugeno: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_sugeno )
-#         print 'Yager: ' + imprime_conjunto_fuzzy( conjunto_fuzzy_yager )
-#     else:
-#         resultado = {}
-#         resultado['padrao'] = conjunto_fuzzy_padrao
-#         resultado['threshold'] = conjunto_fuzzy_threshold
-#         resultado['sugeno'] = conjunto_fuzzy_sugeno
-#         resultado['yager'] = conjunto_fuzzy_yager
-#         return resultado
 #
 #
 # def agregacao(conjunto_fuzzy_1, conjunto_fuzzy_2, return_msg=True):
@@ -517,53 +552,6 @@ def main():
 #         resultado['minimo'] = conjunto_fuzzy_minimo
 #         resultado['maximo'] = conjunto_fuzzy_maximo
 #         return resultado
-#
-#
-# def preenche_conjunto(conjunto_fuzzy):
-#     global min_U, max_U
-#
-#     # Preenche com grau de pertinencia igual a 0 as classes inexistentes nos conjuntos
-#     for c in range(min_U,max_U+1):
-#         chave = str(c)
-#         if not chave in conjunto_fuzzy.keys():
-#             conjunto_fuzzy[chave] = 0.0
-#
-#     return conjunto_fuzzy
-#
-#
-# def imprime_conjunto_fuzzy(conjunto_fuzzy):
-#     # Recebe todas as classes do conjunto e depois as ordena
-#     chaves = conjunto_fuzzy.keys()
-#     chaves.sort()
-#     msg = ''
-#     for chave in chaves:
-#         msg += str(conjunto_fuzzy[chave]) + '/' + chave
-#         if chave != chaves[-1]:
-#             msg += ' + '
-#
-#     return msg
-#
-#
-# def le_conjunto():
-#     conjunto = raw_input('Digite o conjunto fuzzy (Ex.: 0.1/1 + 0.3/2 + 1.0/3): ')
-#     conjunto = conjunto.replace(" ", "")
-#     conjunto = conjunto.split("+")
-#     conjunto_fuzzy = {}
-#     for elemento in conjunto:
-#         el = elemento.split("/")
-#         conjunto_fuzzy[el[1]] = float(el[0])
-#
-#     return conjunto_fuzzy
-#
-#
-# def cria_universo_discurso():
-#     global min_U, max_U
-#
-#     conjunto = raw_input('Digite o primeiro e ultimo numero do Universo de Discurso (Ex.: 0/4): ')
-#     conjunto = conjunto.replace(" ", "")
-#     conjunto = conjunto.split("/")
-#     min_U = int(conjunto[0])
-#     max_U = int(conjunto[1])
 #
 #
 # def funcao_triangular(universo_discurso, a, m, b):
